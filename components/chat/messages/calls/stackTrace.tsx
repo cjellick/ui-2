@@ -16,7 +16,12 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
     const tree: Record<string, any> = {};
     const rootNodes: string[] = [];
 
-    Object.entries(calls).forEach(([id, call]) => {
+    // Sort calls by start timestamp
+    const sortedCalls = Object.entries(calls).sort((a, b) => 
+      new Date(a[1].start).getTime() - new Date(b[1].start).getTime()
+    );
+
+    sortedCalls.forEach(([id, call]) => {
       const parentId = call.parentID || '';
       if (!parentId) {
         rootNodes.push(id);
@@ -27,6 +32,18 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
         tree[parentId].push(id);
       }
     });
+
+    // Sort child nodes by start timestamp
+    Object.keys(tree).forEach(key => {
+      tree[key].sort((a: string, b: string) => 
+        new Date(calls[a].start).getTime() - new Date(calls[b].start).getTime()
+      );
+    });
+
+    // Sort root nodes by start timestamp
+    rootNodes.sort((a, b) => 
+      new Date(calls[a].start).getTime() - new Date(calls[b].start).getTime()
+    );
 
     return { tree, rootNodes };
   };
