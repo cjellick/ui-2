@@ -79,27 +79,33 @@ const Summary = ({ call }: { call: CallFrame }) => {
   const category = call.toolCategory;
   const idDisplay = `[ID: ${call.id}]`;
 
+  const startTime = new Date(call.start).toLocaleTimeString();
+  const endTime = call.end ? new Date(call.end).toLocaleTimeString() : 'In progress';
+  const duration = call.end 
+    ? `${((new Date(call.end).getTime() - new Date(call.start).getTime()) / 1000).toFixed(2)}s`
+    : 'N/A';
+
+  const timeInfo = `(${startTime} - ${endTime}, ${duration})`;
+
+  let summaryContent;
   if (call.tool?.chat) {
-    return (
-      <summary>
-        {idDisplay}{' '}
-        {call.type !== 'callFinish'
-          ? `Chat open with ${name}`
-          : `Chatted with ${name}`}
-      </summary>
-    );
+    summaryContent = call.type !== 'callFinish'
+      ? `Chat open with ${name}`
+      : `Chatted with ${name}`;
+  } else {
+    summaryContent = call.type !== 'callFinish'
+      ? category
+        ? `Loading ${category} from ${name}` + '...'
+        : `Running ${name}`
+      : category
+        ? `Loaded ${category} from ${name}`
+        : `Ran ${name}`;
   }
 
   return (
     <summary>
-      {idDisplay}{' '}
-      {call.type !== 'callFinish'
-        ? category
-          ? `Loading ${category} from ${name}` + '...'
-          : `Running ${name}`
-        : category
-          ? `Loaded ${category} from ${name}`
-          : `Ran ${name}`}
+      {idDisplay} {summaryContent}{' '}
+      <span className="text-xs text-gray-400">{timeInfo}</span>
       {call?.type !== 'callFinish' && (
         <AiOutlineLoading3Quarters className="ml-2 animate-spin inline" />
       )}
