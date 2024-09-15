@@ -21,6 +21,11 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
     );
 
     sortedCalls.forEach(([id, call]) => {
+      // Skip "Loaded provider from GPTScript Gateway Provider" frames
+      if (call.tool?.name === "GPTScript Gateway Provider" && call.type === "callFinish") {
+        return;
+      }
+
       const parentId = call.parentID || '';
       if (!parentId) {
         rootNodes.push(id);
