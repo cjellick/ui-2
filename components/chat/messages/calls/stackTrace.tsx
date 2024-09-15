@@ -26,7 +26,17 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
     const tree: Record<string, any> = {};
     const rootNodes: string[] = [];
 
-    Object.entries(calls).forEach(([id, call]) => {
+    // Sort calls by start timestamp
+    const sortedCalls = Object.entries(calls).sort((a, b) => 
+      new Date(a[1].start).getTime() - new Date(b[1].start).getTime()
+    );
+
+    sortedCalls.forEach(([id, call]) => {
+      // Skip "GPTScript Gateway Provider" calls
+      if (call.tool?.name === "GPTScript Gateway Provider") {
+        return;
+      }
+
       const parentId = call.parentID || '';
       if (!parentId) {
         rootNodes.push(id);
