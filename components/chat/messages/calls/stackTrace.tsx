@@ -74,12 +74,19 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
             </details>
             <details open={allOpen}>
               <summary className="cursor-pointer">Output</summary>
-              <ul className="ml-5 list-disc">
+              <ul className="ml-5 list-none">
                 {call.output &&
                   call.output.map((output, key) =>
                     output.content && (
-                      <li key={key} className="text-xs">
-                        {output.content}
+                      <li key={key} className="mb-2">
+                        <details open={allOpen}>
+                          <summary className="cursor-pointer text-xs">
+                            Message {key + 1}
+                          </summary>
+                          <p className="ml-5 text-xs whitespace-pre-wrap">
+                            {output.content}
+                          </p>
+                        </details>
                       </li>
                     )
                   )}
