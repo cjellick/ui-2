@@ -63,12 +63,12 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
             collapsed={true}
             displayDataTypes={false}
             enableClipboard={false}
-            style={{ fontSize: '12px', backgroundColor: 'transparent' }}
+            style={{ backgroundColor: 'transparent' }}
           />
         );
       } catch (e) {
         // If parsing fails, render as text
-        return <p className="ml-5 text-xs whitespace-pre-wrap">{input}</p>;
+        return <p className="ml-5 whitespace-pre-wrap">{input}</p>;
       }
     }
     // If input is already an object, render as JSON
@@ -79,7 +79,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
         collapsed={true}
         displayDataTypes={false}
         enableClipboard={false}
-        style={{ fontSize: '12px', backgroundColor: 'transparent' }}
+        style={{ backgroundColor: 'transparent' }}
       />
     );
   };
@@ -105,10 +105,10 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
                   call.output.map((output, key) => (
                     <li key={key} className="mb-2">
                       <details open={allOpen}>
-                        <summary className="cursor-pointer text-xs">
+                        <summary className="cursor-pointer">
                           Message {key + 1}
                         </summary>
-                        <p className="ml-5 text-xs whitespace-pre-wrap">
+                        <p className="ml-5 whitespace-pre-wrap">
                           {output.content || "Subcall being made/requested"}
                         </p>
                       </details>
@@ -116,7 +116,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
                   ))
                 ) : (
                   <li>
-                    <p className="ml-5 text-xs">No output available</p>
+                    <p className="ml-5">No output available</p>
                   </li>
                 )}
               </ul>
