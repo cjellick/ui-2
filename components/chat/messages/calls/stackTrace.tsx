@@ -41,21 +41,21 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
   };
 
   // Render input as JSON if it's a valid JSON string
-  const renderInput = (input: any) => {
-    if (typeof input === 'string') {
+  const renderJson = (data: any) => {
+    if (typeof data === 'string') {
       try {
-        const jsonInput = JSON.parse(input);
+        const jsonData = JSON.parse(data);
         return (
           <pre className="ml-5 text-xs">
-            {JSON.stringify(jsonInput, null, 2)}
+            {JSON.stringify(jsonData, null, 2)}
           </pre>
         );
       } catch (e) {
         // If parsing fails, render as is
-        return <p className="ml-5 text-xs">{input}</p>;
+        return <p className="ml-5 text-xs">{data}</p>;
       }
     }
-    return <pre className="ml-5 text-xs">{JSON.stringify(input, null, 2)}</pre>;
+    return <pre className="ml-5 text-xs">{JSON.stringify(data, null, 2)}</pre>;
   };
 
   // Render tree recursively
@@ -70,7 +70,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           <div className="ml-5">
             <details open={allOpen}>
               <summary className="cursor-pointer">Input</summary>
-              {renderInput(call?.input)}
+              {renderJson(call?.input)}
             </details>
             <details open={allOpen}>
               <summary className="cursor-pointer">Output</summary>
@@ -92,6 +92,18 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
                   )}
               </ul>
             </details>
+            {call.llmRequest && (
+              <details open={allOpen}>
+                <summary className="cursor-pointer">LLM Request</summary>
+                {renderJson(call.llmRequest)}
+              </details>
+            )}
+            {call.llmResponse && (
+              <details open={allOpen}>
+                <summary className="cursor-pointer">LLM Response</summary>
+                {renderJson(call.llmResponse)}
+              </details>
+            )}
             {children.map((childId: string) => renderTree(childId, depth + 1))}
           </div>
         </details>
