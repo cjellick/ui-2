@@ -41,13 +41,32 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
     return { tree, rootNodes };
   };
 
-  // Render JSON with react-json-view
-  const renderJson = (data: any) => {
+  // Render input (JSON or text)
+  const renderInput = (input: any) => {
+    if (typeof input === 'string') {
+      try {
+        const jsonInput = JSON.parse(input);
+        return (
+          <ReactJson
+            src={jsonInput}
+            theme="monokai"
+            collapsed={true}
+            displayDataTypes={false}
+            enableClipboard={false}
+            style={{ fontSize: '12px', backgroundColor: 'transparent' }}
+          />
+        );
+      } catch (e) {
+        // If parsing fails, render as text
+        return <p className="ml-5 text-xs whitespace-pre-wrap">{input}</p>;
+      }
+    }
+    // If input is already an object, render as JSON
     return (
       <ReactJson
-        src={data}
+        src={input}
         theme="monokai"
-        collapsed={2}
+        collapsed={true}
         displayDataTypes={false}
         enableClipboard={false}
         style={{ fontSize: '12px', backgroundColor: 'transparent' }}
@@ -67,7 +86,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           <div className="ml-5">
             <details open={allOpen}>
               <summary className="cursor-pointer">Input</summary>
-              <div className="ml-5">{renderJson(call?.input)}</div>
+              <div className="ml-5">{renderInput(call?.input)}</div>
             </details>
             <details open={allOpen}>
               <summary className="cursor-pointer">Output</summary>
@@ -92,13 +111,13 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
             {call.llmRequest && (
               <details open={allOpen}>
                 <summary className="cursor-pointer">LLM Request</summary>
-                <div className="ml-5">{renderJson(call.llmRequest)}</div>
+                <div className="ml-5">{renderInput(call.llmRequest)}</div>
               </details>
             )}
             {call.llmResponse && (
               <details open={allOpen}>
                 <summary className="cursor-pointer">LLM Response</summary>
-                <div className="ml-5">{renderJson(call.llmResponse)}</div>
+                <div className="ml-5">{renderInput(call.llmResponse)}</div>
               </details>
             )}
             {children.map((childId: string) => renderTree(childId, depth + 1))}
