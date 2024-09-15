@@ -121,6 +121,14 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
                 )}
               </ul>
             </details>
+            {children.length > 0 && (
+              <details open={allOpen}>
+                <summary className="cursor-pointer">Subcalls</summary>
+                <div className="ml-5">
+                  {children.map((childId: string) => renderTree(childId, depth + 1))}
+                </div>
+              </details>
+            )}
             {(call.llmRequest || call.llmResponse) && (
               <details open={allOpen}>
                 <summary className="cursor-pointer">LLM Request & Response</summary>
@@ -137,14 +145,6 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
                       <div className="ml-5">{renderInput(call.llmResponse)}</div>
                     </details>
                   )}
-                </div>
-              </details>
-            )}
-            {children.length > 0 && (
-              <details open={allOpen}>
-                <summary className="cursor-pointer">Subcalls</summary>
-                <div className="ml-5">
-                  {children.map((childId: string) => renderTree(childId, depth + 1))}
                 </div>
               </details>
             )}
