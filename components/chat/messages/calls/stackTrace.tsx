@@ -63,7 +63,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
             collapsed={!allOpen}
             displayDataTypes={false}
             enableClipboard={false}
-            style={{ backgroundColor: 'transparent' }}
+            style={{ backgroundColor: 'transparent', fontSize: 'inherit' }}
           />
         );
       } catch (e) {
@@ -79,9 +79,15 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
         collapsed={!allOpen}
         displayDataTypes={false}
         enableClipboard={false}
-        style={{ backgroundColor: 'transparent' }}
+        style={{ backgroundColor: 'transparent', fontSize: 'inherit' }}
       />
     );
+  };
+
+  // Helper function to truncate and stringify input
+  const truncateInput = (input: any): string => {
+    const stringified = typeof input === 'string' ? input : JSON.stringify(input);
+    return stringified.length > 100 ? stringified.slice(0, 100) + '...' : stringified;
   };
 
   // Render tree recursively
@@ -95,18 +101,20 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           <Summary call={call} />
           <div className="ml-5">
             <details open={allOpen}>
-              <summary className="cursor-pointer">Input</summary>
+              <summary className="cursor-pointer">
+                Input Message: {truncateInput(call?.input)}
+              </summary>
               <div className="ml-5">{renderInput(call?.input)}</div>
             </details>
             <details open={allOpen}>
-              <summary className="cursor-pointer">Output</summary>
+              <summary className="cursor-pointer">Output Messages</summary>
               <ul className="ml-5 list-none">
                 {call.output && call.output.length > 0 ? (
                   call.output.map((output, key) => (
                     <li key={key} className="mb-2">
                       <details open={allOpen}>
                         <summary className="cursor-pointer">
-                          Message {key + 1}
+                          Message {key + 1}: {truncateInput(output.content)}
                         </summary>
                         <p className="ml-5 whitespace-pre-wrap">
                           {output.content || "Subcall being made/requested"}
