@@ -121,19 +121,33 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
                 )}
               </ul>
             </details>
-            {call.llmRequest && (
+            {(call.llmRequest || call.llmResponse) && (
               <details open={allOpen}>
-                <summary className="cursor-pointer">LLM Request</summary>
-                <div className="ml-5">{renderInput(call.llmRequest)}</div>
+                <summary className="cursor-pointer">LLM Request & Response</summary>
+                <div className="ml-5">
+                  {call.llmRequest && (
+                    <details open={allOpen}>
+                      <summary className="cursor-pointer">Request</summary>
+                      <div className="ml-5">{renderInput(call.llmRequest)}</div>
+                    </details>
+                  )}
+                  {call.llmResponse && (
+                    <details open={allOpen}>
+                      <summary className="cursor-pointer">Response</summary>
+                      <div className="ml-5">{renderInput(call.llmResponse)}</div>
+                    </details>
+                  )}
+                </div>
               </details>
             )}
-            {call.llmResponse && (
+            {children.length > 0 && (
               <details open={allOpen}>
-                <summary className="cursor-pointer">LLM Response</summary>
-                <div className="ml-5">{renderInput(call.llmResponse)}</div>
+                <summary className="cursor-pointer">Subcalls</summary>
+                <div className="ml-5">
+                  {children.map((childId: string) => renderTree(childId, depth + 1))}
+                </div>
               </details>
             )}
-            {children.map((childId: string) => renderTree(childId, depth + 1))}
           </div>
         </details>
       </div>
@@ -158,7 +172,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           {allOpen ? <GoArrowUp /> : <GoArrowDown />}
         </Button>
       </Tooltip>
-      {Object.keys(calls).length > 0 ? rootNodes.map((rootId) => renderTree(rootId)) : <EmptyLogs />}
+      {rootNodes.length > 0 ? rootNodes.map((rootId) => renderTree(rootId)) : <EmptyLogs />}
     </div>
   );
 };
