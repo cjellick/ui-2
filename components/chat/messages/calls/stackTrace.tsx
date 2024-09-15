@@ -21,6 +21,26 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
     );
   };
 
+  // Build tree structure
+  const buildTree = (calls: Record<string, CallFrame>) => {
+    const tree: Record<string, any> = {};
+    const rootNodes: string[] = [];
+
+    Object.entries(calls).forEach(([id, call]) => {
+      const parentId = call.parentID || '';
+      if (!parentId) {
+        rootNodes.push(id);
+      } else {
+        if (!tree[parentId]) {
+          tree[parentId] = [];
+        }
+        tree[parentId].push(id);
+      }
+    });
+
+    return { tree, rootNodes };
+  };
+
   // Render input (JSON or text)
   const renderInput = (input: any) => {
     if (typeof input === 'string') {
