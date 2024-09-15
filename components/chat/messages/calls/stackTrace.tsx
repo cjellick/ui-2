@@ -60,7 +60,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           <ReactJson
             src={jsonInput}
             theme="monokai"
-            collapsed={true}
+            collapsed={!allOpen}
             displayDataTypes={false}
             enableClipboard={false}
             style={{ backgroundColor: 'transparent' }}
@@ -76,7 +76,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
       <ReactJson
         src={input}
         theme="monokai"
-        collapsed={true}
+        collapsed={!allOpen}
         displayDataTypes={false}
         enableClipboard={false}
         style={{ backgroundColor: 'transparent' }}
@@ -91,20 +91,20 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
 
     return (
       <div key={nodeId} style={{ marginLeft: `${depth * 20}px` }}>
-        <details open={depth === 0}>
+        <details open={depth === 0 || allOpen}>
           <Summary call={call} />
           <div className="ml-5">
-            <details>
+            <details open={allOpen}>
               <summary className="cursor-pointer">Input</summary>
               <div className="ml-5">{renderInput(call?.input)}</div>
             </details>
-            <details>
+            <details open={allOpen}>
               <summary className="cursor-pointer">Output</summary>
               <ul className="ml-5 list-none">
                 {call.output && call.output.length > 0 ? (
                   call.output.map((output, key) => (
                     <li key={key} className="mb-2">
-                      <details>
+                      <details open={allOpen}>
                         <summary className="cursor-pointer">
                           Message {key + 1}
                         </summary>
@@ -122,7 +122,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
               </ul>
             </details>
             {children.length > 0 && (
-              <details>
+              <details open={allOpen}>
                 <summary className="cursor-pointer">Subcalls</summary>
                 <div className="ml-5">
                   {children.map((childId: string) => renderTree(childId, depth + 1))}
@@ -130,17 +130,17 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
               </details>
             )}
             {(call.llmRequest || call.llmResponse) && (
-              <details>
+              <details open={allOpen}>
                 <summary className="cursor-pointer">LLM Request & Response</summary>
                 <div className="ml-5">
                   {call.llmRequest && (
-                    <details>
+                    <details open={allOpen}>
                       <summary className="cursor-pointer">Request</summary>
                       <div className="ml-5">{renderInput(call.llmRequest)}</div>
                     </details>
                   )}
                   {call.llmResponse && (
-                    <details>
+                    <details open={allOpen}>
                       <summary className="cursor-pointer">Response</summary>
                       <div className="ml-5">{renderInput(call.llmResponse)}</div>
                     </details>
