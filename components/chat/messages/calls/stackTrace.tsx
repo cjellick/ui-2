@@ -40,6 +40,24 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
     return { tree, rootNodes };
   };
 
+  // Render input as JSON if it's a valid JSON string
+  const renderInput = (input: any) => {
+    if (typeof input === 'string') {
+      try {
+        const jsonInput = JSON.parse(input);
+        return (
+          <pre className="ml-5 text-xs">
+            {JSON.stringify(jsonInput, null, 2)}
+          </pre>
+        );
+      } catch (e) {
+        // If parsing fails, render as is
+        return <p className="ml-5 text-xs">{input}</p>;
+      }
+    }
+    return <pre className="ml-5 text-xs">{JSON.stringify(input, null, 2)}</pre>;
+  };
+
   // Render tree recursively
   const renderTree = (nodeId: string, depth: number = 0) => {
     const call = calls[nodeId];
@@ -52,7 +70,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           <div className="ml-5">
             <details open={allOpen}>
               <summary className="cursor-pointer">Input</summary>
-              <pre className="ml-5 text-xs">{JSON.stringify(call?.input, null, 2)}</pre>
+              {renderInput(call?.input)}
             </details>
             <details open={allOpen}>
               <summary className="cursor-pointer">Output</summary>
