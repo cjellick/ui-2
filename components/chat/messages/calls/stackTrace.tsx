@@ -3,6 +3,7 @@ import { Button, Tooltip } from '@nextui-org/react';
 import type { CallFrame } from '@gptscript-ai/gptscript';
 import { GoArrowDown, GoArrowUp } from 'react-icons/go';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import ReactJson from 'react-json-view';
 
 const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
   if (!calls) return null;
@@ -40,22 +41,18 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
     return { tree, rootNodes };
   };
 
-  // Render input as JSON if it's a valid JSON string
+  // Render JSON with react-json-view
   const renderJson = (data: any) => {
-    if (typeof data === 'string') {
-      try {
-        const jsonData = JSON.parse(data);
-        return (
-          <pre className="ml-5 text-xs">
-            {JSON.stringify(jsonData, null, 2)}
-          </pre>
-        );
-      } catch (e) {
-        // If parsing fails, render as is
-        return <p className="ml-5 text-xs">{data}</p>;
-      }
-    }
-    return <pre className="ml-5 text-xs">{JSON.stringify(data, null, 2)}</pre>;
+    return (
+      <ReactJson
+        src={data}
+        theme="monokai"
+        collapsed={2}
+        displayDataTypes={false}
+        enableClipboard={false}
+        style={{ fontSize: '12px', backgroundColor: 'transparent' }}
+      />
+    );
   };
 
   // Render tree recursively
@@ -70,7 +67,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           <div className="ml-5">
             <details open={allOpen}>
               <summary className="cursor-pointer">Input</summary>
-              {renderJson(call?.input)}
+              <div className="ml-5">{renderJson(call?.input)}</div>
             </details>
             <details open={allOpen}>
               <summary className="cursor-pointer">Output</summary>
@@ -95,13 +92,13 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
             {call.llmRequest && (
               <details open={allOpen}>
                 <summary className="cursor-pointer">LLM Request</summary>
-                {renderJson(call.llmRequest)}
+                <div className="ml-5">{renderJson(call.llmRequest)}</div>
               </details>
             )}
             {call.llmResponse && (
               <details open={allOpen}>
                 <summary className="cursor-pointer">LLM Response</summary>
-                {renderJson(call.llmResponse)}
+                <div className="ml-5">{renderJson(call.llmResponse)}</div>
               </details>
             )}
             {children.map((childId: string) => renderTree(childId, depth + 1))}
