@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Button, Tooltip } from '@nextui-org/react';
 import type { CallFrame } from '@gptscript-ai/gptscript';
-import { GoArrowDown, GoArrowUp } from 'react-icons/go';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import ReactJson from 'react-json-view';
 
@@ -169,7 +169,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           radius="full"
           color="primary"
         >
-          {allOpen ? <GoArrowUp /> : <GoArrowDown />}
+          {allOpen ? <FaChevronUp /> : <FaChevronDown />}
         </Button>
       </Tooltip>
       {rootNodes.length > 0 ? rootNodes.map((rootId) => renderTree(rootId)) : <EmptyLogs />}
