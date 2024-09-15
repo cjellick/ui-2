@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button, Tooltip } from '@nextui-org/react';
 import type { CallFrame } from '@gptscript-ai/gptscript';
 import { GoArrowDown, GoArrowUp } from 'react-icons/go';
@@ -9,36 +9,16 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
   if (!calls) return null;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const logsContainerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [allOpen, setAllOpen] = useState(true);
 
-  // Build tree structure
-  const buildTree = (calls: Record<string, CallFrame>) => {
-    const tree: Record<string, any> = {};
-    const rootNodes: string[] = [];
-
-    // Sort calls by start timestamp
-    const sortedCalls = Object.entries(calls).sort((a, b) => 
-      new Date(a[1].start).getTime() - new Date(b[1].start).getTime()
+  const EmptyLogs = () => {
+    return (
+      <div className="">
+        <p>Waiting for the first event from GPTScript...</p>
+      </div>
     );
-
-    sortedCalls.forEach(([id, call]) => {
-      // Skip "Loaded provider from GPTScript Gateway Provider" frames
-      if (call.tool?.name === "GPTScript Gateway Provider" && call.type === "callFinish") {
-        return;
-      }
-
-      const parentId = call.parentID || '';
-      if (!parentId) {
-        rootNodes.push(id);
-      } else {
-        if (!tree[parentId]) {
-          tree[parentId] = [];
-        }
-        tree[parentId].push(id);
-      }
-    });
-
-    return { tree, rootNodes };
   };
 
   // Render input (JSON or text)
@@ -91,21 +71,24 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
             <details open={allOpen}>
               <summary className="cursor-pointer">Output</summary>
               <ul className="ml-5 list-none">
-                {call.output &&
-                  call.output.map((output, key) =>
-                    output.content && (
-                      <li key={key} className="mb-2">
-                        <details open={allOpen}>
-                          <summary className="cursor-pointer text-xs">
-                            Message {key + 1}
-                          </summary>
-                          <p className="ml-5 text-xs whitespace-pre-wrap">
-                            {output.content}
-                          </p>
-                        </details>
-                      </li>
-                    )
-                  )}
+                {call.output && call.output.length > 0 ? (
+                  call.output.map((output, key) => (
+                    <li key={key} className="mb-2">
+                      <details open={allOpen}>
+                        <summary className="cursor-pointer text-xs">
+                          Message {key + 1}
+                        </summary>
+                        <p className="ml-5 text-xs whitespace-pre-wrap">
+                          {output.content || "Subcall being made/requested"}
+                        </p>
+                      </details>
+                    </li>
+                  ))
+                ) : (
+                  <li>
+                    <p className="ml-5 text-xs">No output available</p>
+                  </li>
+                )}
               </ul>
             </details>
             {call.llmRequest && (
@@ -130,7 +113,10 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
   const { tree, rootNodes } = buildTree(calls);
 
   return (
-    <div className="h-full overflow-scroll p-4 rounded-2xl border-2 shadow-lg border-primary border-lg bg-black text-white">
+    <div
+      className="h-full overflow-scroll p-4 rounded-2xl border-2 shadow-lg border-primary border-lg bg-black text-white"
+      ref={logsContainerRef}
+    >
       <Tooltip content={allOpen ? 'Collapse all' : 'Expand all'} closeDelay={0}>
         <Button
           onPress={() => setAllOpen(!allOpen)}
@@ -142,7 +128,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           {allOpen ? <GoArrowUp /> : <GoArrowDown />}
         </Button>
       </Tooltip>
-      {rootNodes.map((rootId) => renderTree(rootId))}
+      {Object.keys(calls).length > 0 ? rootNodes.map((rootId) => renderTree(rootId)) : <EmptyLogs />}
     </div>
   );
 };
