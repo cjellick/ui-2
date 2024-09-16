@@ -117,7 +117,9 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
                           Message {key + 1}: {truncateInput(output.content)}
                         </summary>
                         <p className="ml-5 whitespace-pre-wrap">
-                          {output.content || "Subcall being made/requested"}
+                          {output.content || (output.subCalls 
+                            ? `Subcall(s) invoked: ${Object.keys(output.subCalls).join(', ')}`
+                            : "Subcalls invoked (no ID specified)")}
                         </p>
                       </details>
                     </li>
