@@ -110,20 +110,33 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
               <summary className="cursor-pointer">Output Messages</summary>
               <ul className="ml-5 list-none">
                 {call.output && call.output.length > 0 ? (
-                  call.output.map((output, key) => {
-                    const content = output.content || (output.subCalls 
-                      ? `Subcall(s) invoked: ${Object.keys(output.subCalls).join(', ')}`
-                      : "Subcalls invoked (no ID specified)");
-                    return (
-                      <li key={key} className="mb-2">
-                        <details open={allOpen}>
-                          <summary className="cursor-pointer">
-                            Message {key + 1}: {truncateInput(content)}
-                          </summary>
-                          <p className="ml-5 whitespace-pre-wrap">{content}</p>
-                        </details>
-                      </li>
-                    );
+                  call.output.flatMap((output, key) => {
+                    if (output.content) {
+                      return [(
+                        <li key={`content-${key}`} className="mb-2">
+                          <details open={allOpen}>
+                            <summary className="cursor-pointer">
+                             {truncateInput(output.content)}
+                            </summary>
+                            <p className="ml-5 whitespace-pre-wrap">{output.content}</p>
+                          </details>
+                        </li>
+                      )];
+                    } else if (output.subCalls) {
+                      return Object.entries(output.subCalls).map(([subCallKey, subCall]) => (
+                        <li key={`subcall-${key}-${subCallKey}`} className="mb-2">
+                          <details open={allOpen}>
+                            <summary className="cursor-pointer">
+                              Tool call: {truncateInput(subCallKey)}
+                            </summary>
+                            <p className="ml-5 whitespace-pre-wrap">Tool Call ID: {subCallKey}</p>
+                            <p className="ml-5 whitespace-pre-wrap">Tool ID: {subCall.toolID}</p>
+                            <p className="ml-5 whitespace-pre-wrap">Input: {subCall.input}</p>
+                          </details>
+                        </li>
+                      ));
+                    }
+                    return [];
                   })
                 ) : (
                   <li>
