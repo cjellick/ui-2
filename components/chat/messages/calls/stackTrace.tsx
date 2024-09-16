@@ -110,20 +110,21 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
               <summary className="cursor-pointer">Output Messages</summary>
               <ul className="ml-5 list-none">
                 {call.output && call.output.length > 0 ? (
-                  call.output.map((output, key) => (
-                    <li key={key} className="mb-2">
-                      <details open={allOpen}>
-                        <summary className="cursor-pointer">
-                          Message {key + 1}: {truncateInput(output.content)}
-                        </summary>
-                        <p className="ml-5 whitespace-pre-wrap">
-                          {output.content || (output.subCalls 
-                            ? `Subcall(s) invoked: ${Object.keys(output.subCalls).join(', ')}`
-                            : "Subcalls invoked (no ID specified)")}
-                        </p>
-                      </details>
-                    </li>
-                  ))
+                  call.output.map((output, key) => {
+                    const content = output.content || (output.subCalls 
+                      ? `Subcall(s) invoked: ${Object.keys(output.subCalls).join(', ')}`
+                      : "Subcalls invoked (no ID specified)");
+                    return (
+                      <li key={key} className="mb-2">
+                        <details open={allOpen}>
+                          <summary className="cursor-pointer">
+                            Message {key + 1}: {truncateInput(content)}
+                          </summary>
+                          <p className="ml-5 whitespace-pre-wrap">{content}</p>
+                        </details>
+                      </li>
+                    );
+                  })
                 ) : (
                   <li>
                     <p className="ml-5">No output available</p>
