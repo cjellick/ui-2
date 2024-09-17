@@ -5,7 +5,7 @@ import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import ReactJson from 'react-json-view';
 
-const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
+const CallFrames = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
   if (!calls) return null;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -107,7 +107,7 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
               <div className="ml-5">{renderInput(call?.input)}</div>
             </details>
             <details open={allOpen}>
-              <summary className="cursor-pointer">Messages from LLM</summary>
+              <summary className="cursor-pointer">Messages</summary>
               <ul className="ml-5 list-none">
                 {call.output && call.output.length > 0 ? (
                   call.output.flatMap((output, key) => {
@@ -252,4 +252,4 @@ const Summary = ({ call }: { call: CallFrame }) => {
   );
 };
 
-export default StackTrace;
+export default CallFrames;
