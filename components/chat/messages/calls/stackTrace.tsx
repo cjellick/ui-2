@@ -102,12 +102,12 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
           <div className="ml-5">
             <details open={allOpen}>
               <summary className="cursor-pointer">
-                Input Message: {truncateInput(call?.input)}
+                Message to LLM: {truncateInput(call?.input)}
               </summary>
               <div className="ml-5">{renderInput(call?.input)}</div>
             </details>
             <details open={allOpen}>
-              <summary className="cursor-pointer">Output Messages</summary>
+              <summary className="cursor-pointer">Messages from LLM</summary>
               <ul className="ml-5 list-none">
                 {call.output && call.output.length > 0 ? (
                   call.output.flatMap((output, key) => {
@@ -155,17 +155,25 @@ const StackTrace = ({ calls }: { calls: Record<string, CallFrame> | null }) => {
             )}
             {(call.llmRequest || call.llmResponse) && (
               <details open={allOpen}>
-                <summary className="cursor-pointer">LLM Request & Response</summary>
+                <summary className="cursor-pointer">
+                  {call.llmRequest && 'messages' in call.llmRequest
+                    ? 'LLM Request & Response'
+                    : 'Tool Command and Output'}
+                </summary>
                 <div className="ml-5">
                   {call.llmRequest && (
                     <details open={allOpen}>
-                      <summary className="cursor-pointer">Request</summary>
+                      <summary className="cursor-pointer">
+                        {call.llmRequest && 'messages' in call.llmRequest ? 'Request' : 'Command'}
+                      </summary>
                       <div className="ml-5">{renderInput(call.llmRequest)}</div>
                     </details>
                   )}
                   {call.llmResponse && (
                     <details open={allOpen}>
-                      <summary className="cursor-pointer">Response</summary>
+                      <summary className="cursor-pointer">
+                        {call.llmRequest && 'messages' in call.llmRequest ? 'Response' : 'Output'}
+                      </summary>
                       <div className="ml-5">{renderInput(call.llmResponse)}</div>
                     </details>
                   )}
